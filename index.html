@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0B0F17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FastTracker">
+  <meta name="description" content="Clean, distraction-free Intermittent Fasting Tracker with metabolic stages.">
+  <title>Fasting Tracker — Intermittent Fasting PWA</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+        </div>
+        <span class="app-title">FastTracker</span>
+      </div>
+      <div class="header-right">
+        <button id="streak-badge-btn" class="streak-badge" title="Current streak">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 23c-4.97 0-9-3.8-9-8.5 0-3.23 2.05-6.57 4.2-8.9.46-.5.78-.36.7.27-.37 2.88.93 4.63 2.6 3.63.8-.48 1.4-1.32 1.83-2.15C13.2 5.6 13.5 3.5 13.2 2c0-.2.2-.4.4-.3 3.5 2.1 6.4 6.2 6.4 9.8 0 4.7-4.03 8.5-8 8.5z"/>
+          </svg>
+          <span id="streak-count">0</span>d
+        </button>
+        <button id="notif-toggle-btn" class="icon-btn" title="Toggle Notifications">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Tabs -->
+    <main class="app-main">
+      
+      <!-- TAB 1: TIMER -->
+      <section id="tab-timer" class="tab-pane active">
+        
+        <!-- Protocol Selector Bar -->
+        <div class="protocol-bar-container">
+          <div class="protocol-chips" id="protocol-chips">
+            <button class="chip" data-hours="14">14:10</button>
+            <button class="chip active" data-hours="16">16:8</button>
+            <button class="chip" data-hours="18">18:6</button>
+            <button class="chip" data-hours="20">20:4</button>
+            <button class="chip" data-hours="24">24h OMAD</button>
+            <button class="chip" data-hours="custom" id="chip-custom">Custom</button>
+          </div>
+        </div>
+
+        <!-- Circular Timer Ring Component -->
+        <div class="timer-display-wrapper">
+          <div class="timer-ring-container">
+            <svg class="timer-svg" viewBox="0 0 320 320">
+              <defs>
+                <linearGradient id="ring-gradient-fasting" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38EF7D" />
+                  <stop offset="50%" stop-color="#11998E" />
+                  <stop offset="100%" stop-color="#00D2FF" />
+                </linearGradient>
+                <linearGradient id="ring-gradient-overtime" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FF416C" />
+                  <stop offset="100%" stop-color="#FF4B2B" />
+                </linearGradient>
+                <linearGradient id="ring-gradient-eating" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F7971E" />
+                  <stop offset="100%" stop-color="#FFD200" />
+                </linearGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Track background -->
+              <circle class="ring-track" cx="160" cy="160" r="135" />
+              <!-- Milestone stage tick marks -->
+              <g id="stage-ticks" class="stage-ticks"></g>
+              <!-- Animated Progress Bar -->
+              <circle id="timer-progress-ring" class="ring-progress" cx="160" cy="160" r="135" stroke="url(#ring-gradient-fasting)" />
+            </svg>
+
+            <!-- Inside Ring Info -->
+            <div class="timer-inside-content">
+              <span id="fast-status-badge" class="fast-status-badge">READY TO FAST</span>
+              <div id="timer-primary-time" class="timer-digits">00:00:00</div>
+              <div id="timer-sub-info" class="timer-sub-info">Target: 16h 00m</div>
+              <div id="timer-progress-percent" class="timer-percent">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fast Timestamps (Started & Target End) -->
+        <div class="time-meta-grid" id="time-meta-grid">
+          <div class="meta-card">
+            <span class="meta-label">STARTED</span>
+            <span id="meta-start-time" class="meta-value">--:--</span>
+            <button id="btn-edit-start-time" class="btn-text-link" title="Edit start time">Edit</button>
+          </div>
+          <div class="meta-card">
+            <span class="meta-label">GOAL REACHED</span>
+            <span id="meta-target-time" class="meta-value">--:--</span>
+            <span id="meta-target-date" class="meta-sub">Today</span>
+          </div>
+        </div>
+
+        <!-- Primary Action Button -->
+        <div class="timer-actions">
+          <button id="btn-main-action" class="btn-primary-action btn-start">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </span>
+            <span id="btn-main-action-text">START FASTING</span>
+          </button>
+        </div>
+
+        <!-- Metabolic Stages Section -->
+        <div class="metabolic-stages-card">
+          <div class="card-header">
+            <h3>Metabolic Stages</h3>
+            <span id="current-stage-title" class="current-stage-tag">Digestion</span>
+          </div>
+          <div class="stages-timeline" id="stages-timeline">
+            <!-- Stage items populated dynamically in app.js -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 2: HISTORY & STATS -->
+      <section id="tab-history" class="tab-pane">
+        <div class="section-header">
+          <h2>Fasting Analytics</h2>
+          <button id="btn-add-manual-fast" class="btn-secondary-sm">+ Log Fast</button>
+        </div>
+
+        <!-- Summary Stats Grid -->
+        <div class="stats-summary-grid">
+          <div class="stat-card">
+            <span class="stat-num" id="stat-total-fasts">0</span>
+            <span class="stat-name">Total Fasts</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-current-streak">0d</span>
+            <span class="stat-name">Current Streak</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-longest-streak">0d</span>
+            <span class="stat-name">Longest Streak</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-avg-hours">0.0h</span>
+            <span class="stat-name">Avg Duration</span>
+          </div>
+        </div>
+
+        <!-- History List -->
+        <div class="history-list-wrapper">
+          <div class="list-header">
+            <h3>Recent Fasting Logs</h3>
+            <span id="history-count-badge" class="badge-count">0 records</span>
+          </div>
+          <div id="history-items-container" class="history-items">
+            <!-- Rendered in app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SETTINGS -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="section-header">
+          <h2>Settings & Preferences</h2>
+        </div>
+
+        <div class="settings-group">
+          <h3>Fasting Protocol</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Default Fast Duration</span>
+              <span class="setting-desc">Selected when launching the app</span>
+            </div>
+            <select id="setting-default-protocol" class="setting-select">
+              <option value="14">14:10 (Beginner)</option>
+              <option value="16" selected>16:8 (Standard)</option>
+              <option value="18">18:6 (Advanced)</option>
+              <option value="20">20:4 (Warrior)</option>
+              <option value="24">24:0 (OMAD)</option>
+              <option value="custom">Custom Duration</option>
+            </select>
+          </div>
+
+          <div class="setting-row" id="setting-custom-hours-row" style="display: none;">
+            <div class="setting-info">
+              <span class="setting-title">Custom Fasting Hours</span>
+              <span class="setting-desc">Set duration in hours (1-168)</span>
+            </div>
+            <input type="number" id="setting-custom-hours-input" min="1" max="168" value="16" class="setting-input-num">
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>Notifications & Alerts</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Fast Completion Notification</span>
+              <span class="setting-desc">Alert when your fasting goal is reached</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-notif-complete" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Metabolic Milestone Alerts</span>
+              <span class="setting-desc">Notify when entering Ketosis or Autophagy</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-notif-milestones" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>Data Management</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Export Fasting History</span>
+              <span class="setting-desc">Save a JSON backup file</span>
+            </div>
+            <button id="btn-export-data" class="btn-secondary-sm">Export JSON</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Import Fasting History</span>
+              <span class="setting-desc">Restore from JSON backup</span>
+            </div>
+            <label class="btn-secondary-sm file-input-label">
+              Import JSON
+              <input type="file" id="input-import-data" accept=".json" style="display: none;">
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title danger">Clear All Data</span>
+              <span class="setting-desc">Wipes current fast & history permanently</span>
+            </div>
+            <button id="btn-clear-data" class="btn-danger-sm">Reset</button>
+          </div>
+        </div>
+
+        <div class="app-version-footer">
+          <span>FastTracker PWA v1.0 • Offline Ready</span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="app-bottom-nav">
+      <button class="nav-item active" data-tab="tab-timer">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Timer</span>
+      </button>
+      <button class="nav-item" data-tab="tab-history">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>History</span>
+      </button>
+      <button class="nav-item" data-tab="tab-settings">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- Modals -->
+    <!-- Modal: Edit Start Time -->
+    <div id="modal-edit-start" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Adjust Start Time</h3>
+          <button class="modal-close" data-modal="modal-edit-start">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-hint">Change when you started this fast retroactively:</p>
+          <input type="datetime-local" id="input-edit-start-time" class="modal-datetime-input">
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" data-modal="modal-edit-start">Cancel</button>
+          <button id="btn-save-start-time" class="btn-modal-save">Update Time</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Custom Fast Duration -->
+    <div id="modal-custom-protocol" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Custom Fast Target</h3>
+          <button class="modal-close" data-modal="modal-custom-protocol">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label for="input-custom-hours" class="modal-label">Goal Duration (Hours):</label>
+          <input type="number" id="input-custom-hours" min="1" max="168" value="16" class="modal-input-num">
+          <p class="modal-hint">Example: 16 hours for 16:8, 36 hours for Monk fast.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" data-modal="modal-custom-protocol">Cancel</button>
+          <button id="btn-save-custom-protocol" class="btn-modal-save">Set Target</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Manual Fast Entry -->
+    <div id="modal-manual-fast" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Log a Past Fast</h3>
+          <button class="modal-close" data-modal="modal-manual-fast">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="modal-label">Fast Started At:</label>
+            <input type="datetime-local" id="manual-start-input" class="modal-datetime-input">
+          </div>
+          <div class="form-group">
+            <label class="modal-label">Fast Ended At:</label>
+            <input type="datetime-local" id="manual-end-input" class="modal-datetime-input">
+          </div>
+          <div class="form-group">
+            <label class="modal-label">Target Protocol (Hours):</label>
+            <input type="number" id="manual-target-input" min="1" max="168" value="16" class="modal-input-num">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" data-modal="modal-manual-fast">Cancel</button>
+          <button id="btn-save-manual-fast" class="btn-modal-save">Save Log</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

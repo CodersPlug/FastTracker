@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F17" />
+      <stop offset="100%" stop-color="#131A26" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38EF7D" />
+      <stop offset="50%" stop-color="#11998E" />
+      <stop offset="100%" stop-color="#00D2FF" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded square for PWA icon -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="510" height="510" x="1" y="1" rx="111" fill="none" stroke="#26334D" stroke-width="2" />
+
+  <!-- Outer Progress Arc Ring -->
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#1C2536" stroke-width="24" />
+  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#ringGrad)" stroke-width="24" stroke-linecap="round" stroke-dasharray="1068" stroke-dashoffset="267" transform="rotate(-90 256 256)" filter="url(#glow)" />
+
+  <!-- Center Flame / Cellular Spark Icon (Intermittent Fasting & Autophagy Metaphor) -->
+  <path d="M256 120 C230 180 180 230 180 290 C180 350 214 390 256 390 C298 390 332 350 332 290 C332 230 282 180 256 120 Z" fill="url(#ringGrad)" />
+  <path d="M256 220 C242 260 216 285 216 320 C216 352 234 372 256 372 C278 372 296 352 296 320 C296 285 270 260 256 220 Z" fill="#0B0F17" />
+  <circle cx="256" cy="320" r="16" fill="url(#ringGrad)" filter="url(#glow)" />
+</svg>
